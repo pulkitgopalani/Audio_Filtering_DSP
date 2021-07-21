@@ -1,128 +1,53 @@
 import argparse
 import numpy as np
+from numpy.core.numeric import outer
 import pyaudio as pa
 import matplotlib.pyplot as plt
+
+from utils import *
+from filter import AudioFilter
 
 FORMAT = pa.paInt16
 CHANNELS = 1
 
-root_dir = ""
 
+def filter_signal(**kwargs):
+    """
+    Function to filter a signal using a given filter type.
 
-class Filter:
-    def __init__(self, filter_type, params):
-        self.filter_type = filter_type
-        self.params = params
+    Inputs:
+        record_audio (bool): Whether to record audio. If False, preset_frames should not be None
+        preset_frames (np.ndarray): Test static signals defined by preset_frames
+        filter_type (str): Filter type to use
+        params (dict): Dict of params relevant to filter, refer AudioFilter docstring for details
+        time (int): Time for which to record
+        sample_rate (int): Sampling rate parameter
+        play_audio (bool): Whether to play the resultant signal as audio
 
-        self.filters = ["lowpass", "highpass", "bandpass", "lccde", "pz"]
+    Outputs:
+        out_frames (np.ndarray): Resultant signal after filtering.
+    """
 
-        try:
-            assert self.filter_type in self.filters
+    if kwargs["record_audio"]:
+        in_frames = hear_sound(
+            kwargs["time"], kwargs["sample_rate"], kwargs["chunk"]
+        )
+    else:
+        in_frames = kwargs["preset_frames"]
 
-            if self.filter_type == "lowpass":
-                self.filter = np.concatenate(
-                    np.zeros((self.params["size"] - self.params["f_c"],)),
-                    np.ones((2 * self.params["f_c"],)),
-                    np.zeros((self.params["size"] - self.params["f_c"],)),
-                )
-            elif self.filter_type == "highpass":
-                self.filter = np.concatenate(
-                    np.ones((self.params["size"] - self.params["f_c"],)),
-                    np.zeros((2 * self.params["f_c"],)),
-                    np.ones((self.params["size"] - self.params["f_c"],)),
-                )
-            elif self.filter_type == "bandpass":
-                self.filter = np.concatenate(
-                    np.zeros((self.params["size"] - self.params["f_h"],)),
-                    np.ones((self.params["f_h"] - self.params["f_l"],)),
-                    np.zeros((2 * self.params["f_l"],)),
-                    np.ones((self.params["f_h"] - self.params["f_l"],)),
-                    np.zeros((self.params["size"] - self.params["f_h"],)),
-                )
-            elif self.filter_type == "lccde":
-                self.filter = np.poly1d(self.params["coeffs"])
-            elif self.filter_type == "pz":
-                self.filter = np.poly1d(
-                    self.params["pz"]["zeros"], r=True
-                ) / np.poly1d(self.params["pz"]["poles"], r=True)
+    freq_input = preproc_and_fft_input(in_frames)
 
-        except AssertionError:
-            raise ValueError(
-                f"Invalid filter, please choose from {self.filters}"
-            )
+    filter = AudioFilter(kwargs["filter_type"], kwargs["params"])
 
-    def __call__(self, freq_domain_input):
-        try:
-            assert freq_domain_input.shape == self.filter.shape
-            print("----Applying filter in Frequency domain----")
-            output = self.filter * freq_domain_input
-            return output
+    freq_output = filter(freq_input)
+    out_frames = preproc_and_ifft_output(freq_output)
 
-        except AssertionError:
-            raise ValueError("Shapes of filter and input do not match")
+    if kwargs["play_audio"]:
+        play_sound(out_frames, kwargs["sample_rate"], kwargs["chunk"])
+    else:
+        plot_frames(out_frames)
 
-    def get_filter(self):
-        return self.filter
-
-
-def hear_sound(record_time, sample_rate, chunk):
-    p = pa.PyAudio()
-    in_stream = p.open(
-        format=FORMAT,
-        rate=sample_rate,
-        channels=CHANNELS,
-        frames_per_buffer=chunk,
-        input=True,
-    )
-
-    frames = []
-
-    print("----Recording Audio----")
-
-    for _ in range((record_time * sample_rate) / chunk):
-        data_chunk = in_stream.reaAssertionErrord(chunk)
-        frames.append(data_chunk)
-
-    in_stream.stop_stream()
-    in_stream.close()
-
-    return frames
-
-
-def play_sound(audio, sample_rate, chunk):
-    p = pa.PyAudio()
-    out_stream = p.open(
-        format=FORMAT,
-        rate=sample_rate,
-        channels=CHANNELS,
-        frames_per_buffer=chunk,
-        output=True,
-    )
-
-    print("----Playing Audio----")
-
-    for data_chunk in audio:
-        out_stream.write(data_chunk)
-
-    out_stream.stop_stream()
-    out_stream.close()
-    p.terminate()
-
-    return audio
-
-
-def process_real_time(**kwargs):
-
-    in_data = hear_sound(
-        kwargs["time"], kwargs["sample_rate"], kwargs["chunk"]
-    )
-
-    # Process the sound here
-    filter = Filter(kwargs["filter_type"], kwargs["size"], kwargs["params"])
-
-    out_data = play_sound(
-        kwargs["time"], kwargs["sample_rate"], kwargs["chunk"]
-    )
+    return out_frames
 
 
 def main(args):
