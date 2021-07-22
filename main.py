@@ -10,6 +10,16 @@ from filter import AudioFilter
 FORMAT = pa.paInt16
 CHANNELS = 1
 
+"""
+TODO: 
+    0. Bytes -- np.array conversions
+    1. Test on static input
+    2. Test on pre-recorded file
+    3. Test on live audio
+    4. Check callback function in pyaudio
+       for real time processing
+"""
+
 
 def filter_signal(**kwargs):
     """
@@ -28,19 +38,28 @@ def filter_signal(**kwargs):
         out_frames (np.ndarray): Resultant signal after filtering.
     """
 
-    if kwargs["record_audio"]:
-        in_frames = hear_sound(
-            kwargs["time"], kwargs["sample_rate"], kwargs["chunk"]
+    if kwargs["record-audio-time"] is not None:
+        in_frames = record_live_sound(
+            kwargs["record-audio-time"], kwargs["sample_rate"], kwargs["chunk"]
         )
-    else:
+
+    elif kwargs["pre-recorded-file"] is not None:
+        in_frames = record_audio_file(
+            kwargs["pre-recorded-file"], kwargs["sample_rate"], kwargs["chunk"]
+        )
+
+    elif kwargs["preset_frames"] is not None:
         in_frames = kwargs["preset_frames"]
 
-    freq_input = preproc_and_fft_input(in_frames)
+    else:
+        raise ValueError("Please provide atleast one input for filtering")
+
+    freq_input = preproc_time_input(in_frames)
 
     filter = AudioFilter(kwargs["filter_type"], kwargs["params"])
 
     freq_output = filter(freq_input)
-    out_frames = preproc_and_ifft_output(freq_output)
+    out_frames = preproc_freq_output(freq_output)
 
     if kwargs["play_audio"]:
         play_sound(out_frames, kwargs["sample_rate"], kwargs["chunk"])
@@ -67,10 +86,6 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--time", type=int, default=5, help="Time to record, default: 5 sec"
-    )
-
-    parser.add_argument(
         "--chunk",
         type=int,
         default=1024,
@@ -85,16 +100,23 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--pre-recorded",
-        action="store_true",
-        help="To use prerecorded sound as test",
+        "--record-audio-time",
+        type=int,
+        default=None,
+        help="Recording audio time, default = None",
     )
 
     parser.add_argument(
-        "--pre-recorded-audio",
-        type="str",
-        default="./audio.wav",
-        help="Prerecorded sound file location, default = audio.wav",
+        "--pre-recorded-file",
+        type=str,
+        default=None,
+        help="Prerecorded sound file location, default = None",
+    )
+
+    parser.add_argument(
+        "--static-analysis",
+        action="store_true",
+        help="Static analysis",
     )
 
     args = parser.parse_args()
