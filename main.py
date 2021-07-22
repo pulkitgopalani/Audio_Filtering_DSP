@@ -38,14 +38,19 @@ def filter_signal(**kwargs):
         out_frames (np.ndarray): Resultant signal after filtering.
     """
 
+    try:
+        assert kwargs['record_audio'] or kwargs['pre_recorded_file'] or kwargs['preset_frames']
+    except AssertionError:
+        raise ValueError('All of record_audio, pre-recorded-file and preset-frames cannot be empty.')
+
     if kwargs["record-audio-time"] is not None:
         in_frames = record_live_sound(
             kwargs["record-audio-time"], kwargs["sample_rate"], kwargs["chunk"]
         )
 
-    elif kwargs["pre-recorded-file"] is not None:
+    elif kwargs["pre_recorded_file"] is not None:
         in_frames = record_audio_file(
-            kwargs["pre-recorded-file"], kwargs["sample_rate"], kwargs["chunk"]
+            kwargs["pre_recorded_file"], kwargs["sample_rate"], kwargs["chunk"]
         )
 
     elif kwargs["preset_frames"] is not None:
@@ -63,15 +68,18 @@ def filter_signal(**kwargs):
 
     if kwargs["play_audio"]:
         play_sound(out_frames, kwargs["sample_rate"], kwargs["chunk"])
-    else:
-        plot_frames(out_frames)
+    
+    plot_frames([in_frames, freq_output, freq_input, out_frames], 2)
 
     return out_frames
 
 
 def main(args):
     # do stuff
-    pass
+    mix = generate_mix_freq([1,5,10,20,100], 200)
+    plot_frames(mix)
+
+    # filter_signal()
 
 
 if __name__ == "__main__":

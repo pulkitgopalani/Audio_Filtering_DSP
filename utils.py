@@ -48,6 +48,24 @@ def record_live_sound(record_time, sample_rate, chunk):
 
     return np_frames
 
+def record_audio_file(loc, sample_rate, chunk):
+    """
+    To record sound input from file.
+
+    Inputs:
+        loc (str): File from which sound is recorded.
+        sample_rate (int): sampling rate parameter for processing
+        chunk (int): chunk parameter for processing
+
+    Outputs:
+        np_frames (np.ndarray): input frames as numpy array.
+    """
+
+    """
+    TODO: Convert audio from np.array to bytes.
+    """
+
+    pass
 
 def play_sound(audio, sample_rate, chunk):
     """
@@ -85,28 +103,7 @@ def play_sound(audio, sample_rate, chunk):
     out_stream.close()
     p.terminate()
 
-
-def record_audio_file(loc, sample_rate, chunk):
-    """
-    To record sound input from file.
-
-    Inputs:
-        loc (str): File from which sound is recorded.
-        sample_rate (int): sampling rate parameter for processing
-        chunk (int): chunk parameter for processing
-
-    Outputs:
-        np_frames (np.ndarray): input frames as numpy array.
-    """
-
-    """
-    TODO: Convert audio from np.array to bytes.
-    """
-
-    pass
-
-
-def plot_frames(frames):
+def plot_frames(frames, n_cols):
     """
     Plot frames as matplotlib plot.
 
@@ -121,9 +118,37 @@ def plot_frames(frames):
     TODO: Convert audio from np.array to bytes.
     """
 
-    plt.plot(np.arange(frames.shape[-1], frames))
+    fig, axes = plt.subplot(len(frames) // n_cols, n_cols)
+    pos=0
+    for row in axes:
+        for col in row:
+            col.plot(frames[pos])
+            pos+=1
+    
+    fig.savefig('out.jpg')
     plt.show()
 
+
+def generate_mix_freq(freqs, size):
+    '''
+    Generate frequency mixture of sine waves of freqeuncies in freqs
+
+    Inputs:
+        freqs (list): list of frequencies
+        size (int): size of sample
+
+    Outputs:
+        result (np.ndarray): Sum of sine-waves of all frequencies in freqs.
+    '''
+    
+    result = np.zeros((size,))
+    range = np.linspace(0, size, 10*size)
+
+    for freq in freqs:
+        sin_freq = np.sin(2 * np.pi * freq * range)
+        result += sin_freq
+    
+    return result
 
 def preproc_time_input(in_frames):
     """
