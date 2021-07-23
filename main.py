@@ -39,9 +39,15 @@ def filter_signal(**kwargs):
     """
 
     try:
-        assert kwargs['record_audio'] or kwargs['pre_recorded_file'] or kwargs['preset_frames']
+        assert (
+            kwargs["record_audio"]
+            or kwargs["pre_recorded_file"]
+            or kwargs["preset_frames"]
+        )
     except AssertionError:
-        raise ValueError('All of record_audio, pre-recorded-file and preset-frames cannot be empty.')
+        raise ValueError(
+            "All of record_audio, pre-recorded-file and preset-frames cannot be empty."
+        )
 
     if kwargs["record-audio-time"] is not None:
         in_frames = record_live_sound(
@@ -68,7 +74,7 @@ def filter_signal(**kwargs):
 
     if kwargs["play_audio"]:
         play_sound(out_frames, kwargs["sample_rate"], kwargs["chunk"])
-    
+
     plot_frames([in_frames, freq_output, freq_input, out_frames], 2)
 
     return out_frames
@@ -76,10 +82,23 @@ def filter_signal(**kwargs):
 
 def main(args):
     # do stuff
-    mix = generate_mix_freq([1,5,10,20,100], 200)
-    plot_frames(mix)
+    freqs = [0.1, 200.0, 1000.0, 500.0, 4000.0]
+    mix = generate_mix_freq(freqs)
+    # plt.plot(mix)
+    # plt.show()
 
-    # filter_signal()
+    fft, freqs = preproc_time_input(mix, 22050.0)
+    plt.plot(freqs, np.abs(fft))
+    plt.show()
+    filter = AudioFilter(
+        filter_type="lowpass", params={"f_c": 200, "size": fft.shape[-1] // 2}
+    )
+    freq_output = filter(fft)
+    out_frames = preproc_freq_output(freq_output)
+    plt.plot(
+        np.fft.fftfreq(n=len(filter.get_filter()), d=1 / 22050.0), out_frames
+    )
+    plt.show()
 
 
 if __name__ == "__main__":

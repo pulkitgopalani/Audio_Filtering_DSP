@@ -48,6 +48,7 @@ def record_live_sound(record_time, sample_rate, chunk):
 
     return np_frames
 
+
 def record_audio_file(loc, sample_rate, chunk):
     """
     To record sound input from file.
@@ -66,6 +67,7 @@ def record_audio_file(loc, sample_rate, chunk):
     """
 
     pass
+
 
 def play_sound(audio, sample_rate, chunk):
     """
@@ -103,6 +105,7 @@ def play_sound(audio, sample_rate, chunk):
     out_stream.close()
     p.terminate()
 
+
 def plot_frames(frames, n_cols):
     """
     Plot frames as matplotlib plot.
@@ -118,19 +121,19 @@ def plot_frames(frames, n_cols):
     TODO: Convert audio from np.array to bytes.
     """
 
-    fig, axes = plt.subplot(len(frames) // n_cols, n_cols)
-    pos=0
+    fig, axes = plt.subplot((len(frames) // n_cols, n_cols))
+    pos = 0
     for row in axes:
         for col in row:
             col.plot(frames[pos])
-            pos+=1
-    
-    fig.savefig('out.jpg')
+            pos += 1
+
+    fig.savefig("out.jpg")
     plt.show()
 
 
-def generate_mix_freq(freqs, size):
-    '''
+def generate_mix_freq(freqs):
+    """
     Generate frequency mixture of sine waves of freqeuncies in freqs
 
     Inputs:
@@ -139,18 +142,24 @@ def generate_mix_freq(freqs, size):
 
     Outputs:
         result (np.ndarray): Sum of sine-waves of all frequencies in freqs.
-    '''
-    
-    result = np.zeros((size,))
-    range = np.linspace(0, size, 10*size)
+    """
+    Fs = 22050
+    T = 4
+    range = np.arange(T * Fs) / Fs
+    result = np.zeros_like(range)
 
     for freq in freqs:
         sin_freq = np.sin(2 * np.pi * freq * range)
         result += sin_freq
-    
+
     return result
 
-def preproc_time_input(in_frames):
+
+def next_2_pow(n):
+    return 2 ** (np.ceil(np.log2(n)))
+
+
+def preproc_time_input(in_frames, Fs):
     """
     Preprocess the input signal and obtain its (zero-centered) FFT.
 
@@ -161,11 +170,14 @@ def preproc_time_input(in_frames):
         freq_output (np.ndarray): frequency domain (FFT) output for given input.
     """
 
-    """
-    TODO: Convert audio from np.array to bytes.
-    """
+    input_fft = np.fft.fft(
+        in_frames, n=int(next_2_pow(in_frames.shape[-1]))
+    )  # , )
+    fft_freqs = np.fft.fftfreq(n=len(input_fft), d=1 / Fs)
+    return input_fft, fft_freqs
 
-    pass
+
+# https://stackoverflow.com/questions/25735153/plotting-a-fast-fourier-transform-in-python
 
 
 def preproc_freq_output(freq_output):
@@ -182,5 +194,6 @@ def preproc_freq_output(freq_output):
     """
     TODO: Convert audio from np.array to bytes.
     """
+    ifft = np.fft.irfft(freq_output, freq_output.shape[-1])
 
-    pass
+    return ifft

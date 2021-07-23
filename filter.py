@@ -37,25 +37,39 @@ class AudioFilter:
 
             if self.filter_type == "lowpass":
                 self.filter = np.concatenate(
-                    np.zeros((self.params["size"] - self.params["f_c"],)),
-                    np.ones((2 * self.params["f_c"],)),
-                    np.zeros((self.params["size"] - self.params["f_c"],)),
+                    [
+                        np.zeros((self.params["size"] - self.params["f_c"],)),
+                        np.ones((2 * self.params["f_c"],)),
+                        np.zeros((self.params["size"] - self.params["f_c"],)),
+                    ]
                 )
 
             elif self.filter_type == "highpass":
                 self.filter = np.concatenate(
-                    np.ones((self.params["size"] - self.params["f_c"],)),
-                    np.zeros((2 * self.params["f_c"],)),
-                    np.ones((self.params["size"] - self.params["f_c"],)),
+                    [
+                        np.ones(
+                            (self.params["size"] // 2 - self.params["f_c"],)
+                        ),
+                        np.zeros((2 * self.params["f_c"],)),
+                        np.ones(
+                            (self.params["size"] // 2 - self.params["f_c"],)
+                        ),
+                    ]
                 )
 
             elif self.filter_type == "bandpass":
                 self.filter = np.concatenate(
-                    np.zeros((self.params["size"] - self.params["f_h"],)),
-                    np.ones((self.params["f_h"] - self.params["f_l"],)),
-                    np.zeros((2 * self.params["f_l"],)),
-                    np.ones((self.params["f_h"] - self.params["f_l"],)),
-                    np.zeros((self.params["size"] - self.params["f_h"],)),
+                    [
+                        np.zeros(
+                            (self.params["size"] // 2 - self.params["f_h"],)
+                        ),
+                        np.ones((self.params["f_h"] - self.params["f_l"],)),
+                        np.zeros((2 * self.params["f_l"],)),
+                        np.ones((self.params["f_h"] - self.params["f_l"],)),
+                        np.zeros(
+                            (self.params["size"] // 2 - self.params["f_h"],)
+                        ),
+                    ]
                 )
 
             elif self.filter_type == "lccde":
@@ -71,7 +85,7 @@ class AudioFilter:
                 f"Invalid filter, please choose from {self.filters}"
             )
 
-    def __call__(self, freq_domain_input):
+    def __call__(self, freq_input):
         """
         __call__ method for AudioFilter class. Applies self.filter on given input.
 
@@ -83,12 +97,14 @@ class AudioFilter:
         """
 
         try:
-            assert freq_domain_input.shape == self.filter.shape
-            output = self.filter * freq_domain_input
+            assert freq_input.shape == self.filter.shape
+            output = self.filter * freq_input
             return output
 
         except AssertionError:
-            raise ValueError("Shapes of filter and input do not match")
+            raise ValueError(
+                f"Shapes of filter {self.filter.shape} and input {freq_input.shape} do not match"
+            )
 
     def get_filter(self):
         """
