@@ -3,7 +3,12 @@ import numpy as np
 import pyaudio as pa
 import matplotlib.pyplot as plt
 
-from utils import *
+from audio_utils import (
+    preproc_freq_output,
+    preproc_time_input,
+    plot_frames,
+    play_audio_from_np,
+)
 from filter import AudioFilter
 
 FORMAT = pa.paInt16
@@ -11,9 +16,9 @@ CHUNK = 1024
 CHANNELS = 1
 
 
-def test_sine_mix(in_freqs, filter_type, Fs):
+def test_static(in_frames, filter_type, freq_params, Fs, play_audio=False):
     """
-    Test filters for static sinusoidal signals (mixture of frequencies).
+    Test filters for recorded audio / static sinusoidal signals (mixture of frequencies).
 
     Inputs:
         in_freqs (list): List of frequencies to mix
@@ -24,11 +29,10 @@ def test_sine_mix(in_freqs, filter_type, Fs):
         out_frames (np.ndarray): Processed signal
     """
 
-    in_frames = generate_mix_freq(in_freqs)
     in_fft_freqs, in_fft = preproc_time_input(in_frames, Fs)
 
     filter = AudioFilter(
-        filter_type, params={"freqs": in_fft_freqs, "f_c": 500.0}
+        filter_type, params={"freqs": in_fft_freqs, "f_c": freq_params["f_c"]}
     )
 
     freq_output = filter(in_fft)
@@ -49,10 +53,9 @@ def test_sine_mix(in_freqs, filter_type, Fs):
         }
     )
 
+    if play_audio:
+        play_audio_from_np(out_frames, Fs, CHUNK)
 
-def test_prerec_file(in_frames, filter, Fs):
-    pass
 
-
-def test_live_audio(filter, Fs):
+def test_dynamic(record_time, filter_type, freq_params, Fs):
     pass

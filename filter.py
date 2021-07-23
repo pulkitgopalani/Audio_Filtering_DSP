@@ -49,32 +49,27 @@ class AudioFilter:
                     0.0,
                 )
 
-                """self.filter = np.concatenate(
-                    [
-                        np.ones(
-                            (self.params["size"] // 2 - self.params["f_c"],)
-                        ),
-                        np.zeros((2 * self.params["f_c"],)),
-                        np.ones(
-                            (self.params["size"] // 2 - self.params["f_c"],)
-                        ),
-                    ]
-                )"""
-
             elif self.filter_type == "bandpass":
-                self.filter = np.concatenate(
-                    [
-                        np.zeros(
-                            (self.params["size"] // 2 - self.params["f_h"],)
-                        ),
-                        np.ones((self.params["f_h"] - self.params["f_l"],)),
-                        np.zeros((2 * self.params["f_l"],)),
-                        np.ones((self.params["f_h"] - self.params["f_l"],)),
-                        np.zeros(
-                            (self.params["size"] // 2 - self.params["f_h"],)
-                        ),
-                    ]
+                self.filter = np.where(
+                    np.abs(self.params["freqs"]) >= self.params["f_l"]
+                    and np.abs(self.params["freqs"]) <= self.params["f_h"],
+                    1.0,
+                    0.0,
                 )
+
+                # self.filter = np.concatenate(
+                #     [
+                #         np.zeros(
+                #             (self.params["size"] // 2 - self.params["f_h"],)
+                #         ),
+                #         np.ones((self.params["f_h"] - self.params["f_l"],)),
+                #         np.zeros((2 * self.params["f_l"],)),
+                #         np.ones((self.params["f_h"] - self.params["f_l"],)),
+                #         np.zeros(
+                #             (self.params["size"] // 2 - self.params["f_h"],)
+                #         ),
+                #     ]
+                # )
 
             elif self.filter_type == "lccde":
                 self.filter = np.poly1d(self.params["coeffs"], variable="z")

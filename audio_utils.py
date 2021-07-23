@@ -1,19 +1,20 @@
-from re import S
 from typing import Tuple
 import numpy as np
+from numpy.core.arrayprint import dtype_short_repr
 import pyaudio as pa
 import matplotlib.pyplot as plt
+import wave
+from scipy.io.wavfile import read
 
-from test_filters import *
 from filter import AudioFilter
 
 FORMAT = pa.paInt16
 CHANNELS = 1
 
-F_SAMPLE = 22050.0
+# ---------------------------- AUDIO UTILS ----------------------------#
 
 
-def record_live_sound(record_time, sample_rate, chunk):
+def record_live_audio(record_time, sample_rate, chunk):
     """
     To record sound input from live audio input.
 
@@ -56,7 +57,7 @@ def record_live_sound(record_time, sample_rate, chunk):
     return np_frames
 
 
-def record_audio_file(loc, sample_rate, chunk):
+def record_prerec_audio(prerec_file, sample_rate, chunk):
     """
     To record sound input from file.
 
@@ -69,14 +70,13 @@ def record_audio_file(loc, sample_rate, chunk):
         np_frames (np.ndarray): input frames as numpy array.
     """
 
-    """
-    TODO: Convert audio from np.array to bytes.
-    """
+    soundfile = read(prerec_file)
+    in_frames = np.array(soundfile[1], dtype=float)
 
-    pass
+    return in_frames
 
 
-def play_sound(audio, sample_rate, chunk):
+def play_audio_from_np(out_frames, sample_rate, chunk):
     """
     To play given frames as audio.
 
@@ -89,28 +89,27 @@ def play_sound(audio, sample_rate, chunk):
         None
     """
 
-    """
-    TODO: Convert audio from np.array to bytes.
-    """
-
     p = pa.PyAudio()
+
+    out_frames = np.round(out_frames).astype(np.int16)
 
     out_stream = p.open(
         format=FORMAT,
-        rate=sample_rate,
-        channels=CHANNELS,
-        frames_per_buffer=chunk,
+        rate=int(sample_rate),
+        channels=len(out_frames.shape),
         output=True,
     )
 
     print("----Playing Audio----")
 
-    for data_chunk in audio:
-        out_stream.write(data_chunk)
+    out_stream.write(out_frames.tobytes())
 
     out_stream.stop_stream()
     out_stream.close()
     p.terminate()
+
+
+# ---------------------------- PLOT & FFT UTILS ----------------------------#
 
 
 def plot_frames(frame_dict, n_cols=2, filename="out.jpg"):

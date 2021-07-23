@@ -3,7 +3,7 @@ import numpy as np
 import pyaudio as pa
 import matplotlib.pyplot as plt
 
-from utils import *
+from audio_utils import *
 from test_filters import *
 from filter import AudioFilter
 
@@ -15,7 +15,7 @@ CHANNELS = 1
 TODO: 
     0. Bytes -- np.array conversions
     1. (Done) Test on static input
-    2. Test on pre-recorded file
+    2. (Done) Test on pre-recorded file
     3. Test on live audio
     4. Check callback function in pyaudio
        for real time processing
@@ -24,21 +24,39 @@ TODO:
 
 def main(args):
 
+    freq_params = {"f_c": 4000.0, "f_l": 4000.0, "f_h": 6000.0}
+
     if args.static_analysis:
         in_freqs = [10.0, 200.0, 500.0, 2000.0, 5000.0]
-        test_sine_mix(
-            in_freqs=in_freqs, filter_type=args.filter, Fs=args.sample_rate
-        )
+        in_frames = generate_mix_freq(in_freqs)
 
-    elif args.pre_recorded_file:
-        test_prerec_file(
-            prerec_file=args.pre_recorded_file,
+        test_static(
+            in_frames=in_frames,
             filter_type=args.filter,
+            freq_params=freq_params,
             Fs=args.sample_rate,
         )
 
+    elif args.prerec_file:
+        in_frames = record_prerec_audio(
+            args.prerec_file, args.sample_rate, CHUNK
+        )
+
+        test_static(
+            in_frames=in_frames,
+            filter_type=args.filter,
+            freq_params=freq_params,
+            Fs=args.sample_rate,
+            play_audio=args.play_audio,
+        )
+
     elif args.record_audio:
-        test_live_audio(record_time=args.record_audio, Fs=args.sample_rate)
+        test_dynamic(
+            record_time=args.record_audio,
+            filter_type=args.filter,
+            freq_params=freq_params,
+            Fs=args.sample_rate,
+        )
 
     else:
         raise ValueError(
@@ -72,7 +90,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--pre_recorded_file",
+        "--prerec_file",
         type=str,
         default=None,
         help="Prerecorded sound file location, default = None",
@@ -82,6 +100,12 @@ if __name__ == "__main__":
         "--static_analysis",
         action="store_true",
         help="Static analysis",
+    )
+
+    parser.add_argument(
+        "--play_audio",
+        action="store_true",
+        help="Play audio",
     )
 
     args = parser.parse_args()
