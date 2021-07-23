@@ -1,9 +1,16 @@
+from re import S
+from typing import Tuple
 import numpy as np
 import pyaudio as pa
 import matplotlib.pyplot as plt
 
+from test_filters import *
+from filter import AudioFilter
+
 FORMAT = pa.paInt16
 CHANNELS = 1
+
+F_SAMPLE = 22050.0
 
 
 def record_live_sound(record_time, sample_rate, chunk):
@@ -106,7 +113,7 @@ def play_sound(audio, sample_rate, chunk):
     p.terminate()
 
 
-def plot_frames(frames, n_cols):
+def plot_frames(frame_dict, n_cols=2, filename="out.jpg"):
     """
     Plot frames as matplotlib plot.
 
@@ -117,19 +124,26 @@ def plot_frames(frames, n_cols):
         None
     """
 
-    """
-    TODO: Convert audio from np.array to bytes.
-    """
+    frames = list(frame_dict.values())
+    titles = list(frame_dict)
 
-    fig, axes = plt.subplot((len(frames) // n_cols, n_cols))
+    fig, axes = plt.subplots(
+        len(frames) // n_cols, n_cols, constrained_layout=True
+    )
+
     pos = 0
     for row in axes:
         for col in row:
-            col.plot(frames[pos])
+            if isinstance(frames[pos], Tuple):
+                col.plot(frames[pos][0], frames[pos][1])
+            else:
+                col.plot(frames[pos])
+
+            col.set_title(titles[pos])
             pos += 1
 
-    fig.savefig("out.jpg")
-    plt.show()
+    fig.savefig(filename)
+    plt.close()
 
 
 def generate_mix_freq(freqs):
@@ -143,6 +157,7 @@ def generate_mix_freq(freqs):
     Outputs:
         result (np.ndarray): Sum of sine-waves of all frequencies in freqs.
     """
+
     Fs = 22050
     T = 4
     range = np.arange(T * Fs) / Fs
@@ -170,30 +185,22 @@ def preproc_time_input(in_frames, Fs):
         freq_output (np.ndarray): frequency domain (FFT) output for given input.
     """
 
-    input_fft = np.fft.fft(
-        in_frames, n=int(next_2_pow(in_frames.shape[-1]))
-    )  # , )
+    input_fft = np.fft.fft(in_frames, n=int(next_2_pow(in_frames.shape[-1])))
     fft_freqs = np.fft.fftfreq(n=len(input_fft), d=1 / Fs)
-    return input_fft, fft_freqs
+    return fft_freqs, input_fft
 
 
-# https://stackoverflow.com/questions/25735153/plotting-a-fast-fourier-transform-in-python
-
-
-def preproc_freq_output(freq_output):
+def preproc_freq_output(freq_output, size):
     """
-    Preprocess the input signal and obtain its (zero-centered) FFT.
+    Preprocess the frequency domain output signal and obtain its time domain signal.
 
     Inputs:
         freq_output (np.ndarray): output signals in frequency domain in form of np.array
 
     Outputs:
-        freq_output (np.ndarray): time domain (FFT) output for given input.
+        freq_output (np.ndarray): time domain (IFFT) output for given input.
     """
 
-    """
-    TODO: Convert audio from np.array to bytes.
-    """
-    ifft = np.fft.irfft(freq_output, freq_output.shape[-1])
+    ifft = np.fft.ifft(freq_output)[:size].real
 
     return ifft
