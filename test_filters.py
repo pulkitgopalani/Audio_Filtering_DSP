@@ -3,7 +3,7 @@ import numpy as np
 import pyaudio as pa
 import matplotlib.pyplot as plt
 
-from audio_utils import (
+from utils import (
     preproc_freq_output,
     preproc_time_input,
     plot_frames,

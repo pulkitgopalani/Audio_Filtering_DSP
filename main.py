@@ -3,9 +3,8 @@ import numpy as np
 import pyaudio as pa
 import matplotlib.pyplot as plt
 
-from audio_utils import *
+from utils import *
 from test_filters import *
-from filter import AudioFilter
 
 FORMAT = pa.paInt16
 CHUNK = 1024
