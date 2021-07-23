@@ -1,6 +1,5 @@
 from typing import Tuple
 import numpy as np
-from numpy.core.arrayprint import dtype_short_repr
 import pyaudio as pa
 import matplotlib.pyplot as plt
 import wave
