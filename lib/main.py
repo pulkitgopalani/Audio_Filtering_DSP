@@ -24,11 +24,14 @@ TODO:
 
 def main(args):
 
-    params = {"f_c": 200.0, "f_l": 4000.0, "f_h": 6000.0}
+    params = {"freqs": {"f_c": 2000.0, "f_l": 4000.0, "f_h": 6000.0}}
 
     lccde_params = {"coeffs": {"nr": [1.0, 1.0], "dr": [1.0, 1.0]}}
 
+    pz_params = {"pz": {"poles": [1.0, 2.0], "zeros": [3.0, 4.0]}}
+
     params.update(lccde_params)
+    params.update(pz_params)
 
     if args.static_analysis:
         in_freqs = [10.0, 200.0, 500.0, 2000.0, 5000.0]

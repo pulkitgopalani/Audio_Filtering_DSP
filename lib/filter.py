@@ -32,20 +32,21 @@ class AudioFilter:
         self.params = params
         self.filter = None
         self.filters = ["lowpass", "highpass", "bandpass", "lccde", "pz"]
+        eps = 1e-4
 
         try:
             assert self.filter_type in self.filters
 
             if self.filter_type == "lowpass":
                 self.filter = np.where(
-                    np.abs(self.freqs) < self.params["f_c"],
+                    np.abs(self.freqs) < self.params["freqs"]["f_c"],
                     1.0,
                     0.0,
                 )
 
             elif self.filter_type == "highpass":
                 self.filter = np.where(
-                    np.abs(self.freqs) > self.params["f_c"],
+                    np.abs(self.freqs) > self.params["freqs"]["f_c"],
                     1.0,
                     0.0,
                 )
@@ -53,8 +54,8 @@ class AudioFilter:
             elif self.filter_type == "bandpass":
                 self.filter = np.where(
                     np.logical_and(
-                        (np.abs(self.freqs) > self.params["f_l"]),
-                        (np.abs(self.freqs) < self.params["f_h"]),
+                        (np.abs(self.freqs) > self.params["freqs"]["f_l"]),
+                        (np.abs(self.freqs) < self.params["freqs"]["f_h"]),
                     ),
                     1.0,
                     0.0,
@@ -63,15 +64,16 @@ class AudioFilter:
             elif self.filter_type == "lccde":
                 nr = np.poly1d(self.params["coeffs"]["nr"])
                 dr = np.poly1d(self.params["coeffs"]["dr"])
-                # print(type(rational_func), self.freqs)
-                self.filter = nr(np.exp(1j * 2 * np.pi * self.freqs)) / dr(
-                    np.exp(1j * 2 * np.pi * self.freqs)
+                self.filter = nr(np.exp(1j * 2 * np.pi * self.freqs)) / (
+                    dr(np.exp(1j * 2 * np.pi * self.freqs)) + eps
                 )
 
             elif self.filter_type == "pz":
-                self.filter = np.poly1d(
-                    self.params["pz"]["zeros"], r=True, variable="z"
-                ) / np.poly1d(self.params["pz"]["poles"], r=True, variable="z")
+                nr = np.poly1d(self.params["pz"]["zeros"], r=True)
+                dr = np.poly1d(self.params["pz"]["poles"], r=True)
+                self.filter = nr(np.exp(1j * 2 * np.pi * self.freqs)) / (
+                    dr(np.exp(1j * 2 * np.pi * self.freqs)) + eps
+                )
 
         except AssertionError:
             raise ValueError(
@@ -104,4 +106,4 @@ class AudioFilter:
         Returns the filter as self.filter.
         """
 
-        return self.filter * np.ones_like(self.filter)
+        return self.filter

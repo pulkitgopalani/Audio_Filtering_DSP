@@ -22,4 +22,4 @@ Args are:
     --play_audio : Playing output audio
   ```
   
-Please change the frequency mixture (for static analysis) and filters parameters direclty in main.py. 
+Please change the frequency mixture (for static analysis) and filters parameters directly in main.py. 
