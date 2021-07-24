@@ -111,7 +111,7 @@ def play_audio_from_np(out_frames, sample_rate):
 # ---------------------------- PLOT & FFT UTILS ----------------------------#
 
 
-def plot_frames(frame_dict, n_cols=2, filename="../assets/out.jpg"):
+def plot_frames(frame_dict, n_cols=2, filename="../assets/analysis.jpg"):
     """
     Plot frames as matplotlib plot.
 
