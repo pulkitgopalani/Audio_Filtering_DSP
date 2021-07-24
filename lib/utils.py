@@ -75,7 +75,7 @@ def record_prerec_audio(prerec_file, sample_rate, chunk):
     return in_frames
 
 
-def play_audio_from_np(out_frames, sample_rate, chunk):
+def play_audio_from_np(out_frames, sample_rate):
     """
     To play given frames as audio.
 
@@ -111,7 +111,7 @@ def play_audio_from_np(out_frames, sample_rate, chunk):
 # ---------------------------- PLOT & FFT UTILS ----------------------------#
 
 
-def plot_frames(frame_dict, n_cols=2, filename="out.jpg"):
+def plot_frames(frame_dict, n_cols=2, filename="../assets/out.jpg"):
     """
     Plot frames as matplotlib plot.
 

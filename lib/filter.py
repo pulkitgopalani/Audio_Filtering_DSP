@@ -9,7 +9,7 @@ class AudioFilter:
     Class for audio filter.
     """
 
-    def __init__(self, filter_type, params):
+    def __init__(self, filter_type, freqs, params):
         """
         Initialize filter based on filter_type and params.
 
@@ -28,6 +28,7 @@ class AudioFilter:
         """
 
         self.filter_type = filter_type
+        self.freqs = freqs
         self.params = params
         self.filter = None
         self.filters = ["lowpass", "highpass", "bandpass", "lccde", "pz"]
@@ -37,42 +38,35 @@ class AudioFilter:
 
             if self.filter_type == "lowpass":
                 self.filter = np.where(
-                    np.abs(self.params["freqs"]) <= self.params["f_c"],
+                    np.abs(self.freqs) < self.params["f_c"],
                     1.0,
                     0.0,
                 )
 
             elif self.filter_type == "highpass":
                 self.filter = np.where(
-                    np.abs(self.params["freqs"]) >= self.params["f_c"],
+                    np.abs(self.freqs) > self.params["f_c"],
                     1.0,
                     0.0,
                 )
 
             elif self.filter_type == "bandpass":
                 self.filter = np.where(
-                    np.abs(self.params["freqs"]) >= self.params["f_l"]
-                    and np.abs(self.params["freqs"]) <= self.params["f_h"],
+                    np.logical_and(
+                        (np.abs(self.freqs) > self.params["f_l"]),
+                        (np.abs(self.freqs) < self.params["f_h"]),
+                    ),
                     1.0,
                     0.0,
                 )
 
-                # self.filter = np.concatenate(
-                #     [
-                #         np.zeros(
-                #             (self.params["size"] // 2 - self.params["f_h"],)
-                #         ),
-                #         np.ones((self.params["f_h"] - self.params["f_l"],)),
-                #         np.zeros((2 * self.params["f_l"],)),
-                #         np.ones((self.params["f_h"] - self.params["f_l"],)),
-                #         np.zeros(
-                #             (self.params["size"] // 2 - self.params["f_h"],)
-                #         ),
-                #     ]
-                # )
-
             elif self.filter_type == "lccde":
-                self.filter = np.poly1d(self.params["coeffs"], variable="z")
+                nr = np.poly1d(self.params["coeffs"]["nr"])
+                dr = np.poly1d(self.params["coeffs"]["dr"])
+                # print(type(rational_func), self.freqs)
+                self.filter = nr(np.exp(1j * 2 * np.pi * self.freqs)) / dr(
+                    np.exp(1j * 2 * np.pi * self.freqs)
+                )
 
             elif self.filter_type == "pz":
                 self.filter = np.poly1d(

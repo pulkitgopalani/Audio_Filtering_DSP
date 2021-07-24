@@ -24,7 +24,11 @@ TODO:
 
 def main(args):
 
-    freq_params = {"f_c": 4000.0, "f_l": 4000.0, "f_h": 6000.0}
+    params = {"f_c": 200.0, "f_l": 4000.0, "f_h": 6000.0}
+
+    lccde_params = {"coeffs": {"nr": [1.0, 1.0], "dr": [1.0, 1.0]}}
+
+    params.update(lccde_params)
 
     if args.static_analysis:
         in_freqs = [10.0, 200.0, 500.0, 2000.0, 5000.0]
@@ -33,7 +37,7 @@ def main(args):
         test_static(
             in_frames=in_frames,
             filter_type=args.filter,
-            freq_params=freq_params,
+            params=params,
             Fs=args.sample_rate,
         )
 
@@ -45,7 +49,7 @@ def main(args):
         test_static(
             in_frames=in_frames,
             filter_type=args.filter,
-            freq_params=freq_params,
+            params=params,
             Fs=args.sample_rate,
             play_audio=args.play_audio,
         )
@@ -54,7 +58,7 @@ def main(args):
         test_dynamic(
             record_time=args.record_audio,
             filter_type=args.filter,
-            freq_params=freq_params,
+            params=params,
             Fs=args.sample_rate,
         )
 

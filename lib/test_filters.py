@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+from numpy import fft
 import pyaudio as pa
 import matplotlib.pyplot as plt
 
@@ -16,7 +17,7 @@ CHUNK = 1024
 CHANNELS = 1
 
 
-def test_static(in_frames, filter_type, freq_params, Fs, play_audio=False):
+def test_static(in_frames, filter_type, params, Fs, play_audio=False):
     """
     Test filters for recorded audio / static sinusoidal signals (mixture of frequencies).
 
@@ -31,9 +32,7 @@ def test_static(in_frames, filter_type, freq_params, Fs, play_audio=False):
 
     in_fft_freqs, in_fft = preproc_time_input(in_frames, Fs)
 
-    filter = AudioFilter(
-        filter_type, params={"freqs": in_fft_freqs, "f_c": freq_params["f_c"]}
-    )
+    filter = AudioFilter(filter_type, in_fft_freqs, params=params)
 
     freq_output = filter(in_fft)
     out_frames = preproc_freq_output(freq_output, in_frames.size)
@@ -54,8 +53,8 @@ def test_static(in_frames, filter_type, freq_params, Fs, play_audio=False):
     )
 
     if play_audio:
-        play_audio_from_np(out_frames, Fs, CHUNK)
+        play_audio_from_np(out_frames, Fs)
 
 
-def test_dynamic(record_time, filter_type, freq_params, Fs):
+def test_dynamic(record_time, filter_type, params, Fs):
     pass
