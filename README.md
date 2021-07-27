@@ -17,7 +17,7 @@ Run the following command in the `./lib/` directory:
 
 Args are:  
   ```bash
-    --filter : Filter type (default: lowpass, options: lowpass, highpass, bandpass, lccde, pz)
+    --filter : Filter type (default: lowpass, options: lowpass, highpass, bandpass, bandstop, gaussian, lccde, pz)
     --sample_rate: Sampling rate (default: 22050.)
     --static_analysis : For testing mixture of sinusoids
     --prerec_file : For testing pre-recorded .wav file
