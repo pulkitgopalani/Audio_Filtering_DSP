@@ -14,7 +14,6 @@ from utils import (
 from audio_filter import AudioFilter
 
 FORMAT = pa.paInt16
-CHUNK = 1024
 CHANNELS = 1
 
 
@@ -39,7 +38,7 @@ def test_static(in_frames, filter_type, params, Fs, play_audio=False):
     plt.ylabel("|H(z)|")
     plt.plot(
         in_fft_freqs[in_fft_freqs >= 0],
-        filter.filter[: filter.filter.size // 2],
+        np.abs(filter.filter[: filter.filter.size // 2]),
     )
     plt.savefig("../assets/plots/filter.jpg")
     plt.close()
@@ -126,6 +125,15 @@ def test_dynamic(
         if play_audio:
             byte = out_frame_np.tobytes()
             out_stream.write(byte)
+
+        plt.xlabel("Frequency")
+        plt.ylabel("|H(z)|")
+        plt.plot(
+            in_fft_freqs[in_fft_freqs >= 0],
+            np.abs(filter.filter[: filter.filter.size // 2]),
+        )
+        plt.savefig("../assets/plots/filter.jpg")
+        plt.close()
 
         plot_frames(
             {

@@ -3,12 +3,12 @@
 Audio filtering using Fourier transforms based filters.
 
 Requirements:  
-* Python 3  
+* Python 3.8 
 * Numpy  
 * Matplotlib  
 * PyAudio
 
-Run the following command in the DSP_Project directory:
+Run the following command in the `DSP_Project/lib/` directory:
 
 `python main.py (--args)`  
 
@@ -22,4 +22,4 @@ Args are:
     --play_audio : Playing output audio
   ```
   
-Please change the frequency mixture (for static analysis) and filters parameters directly in main.py. 
+Please change the frequency mixture (for static analysis) directly in main.py. 

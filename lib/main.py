@@ -7,7 +7,6 @@ from utils import *
 from filter_util import *
 
 FORMAT = pa.paInt16
-CHUNK = 1024
 CHANNELS = 1
 
 
@@ -15,7 +14,7 @@ def main(args):
 
     params = {"freqs": {"f_c": args.fc, "f_l": args.fl, "f_h": args.fh}}
 
-    lccde_params = {"coeffs": {"nr": [1.0, 1.0], "dr": [1.0, 1.0]}}
+    lccde_params = {"coeffs": {"nr": [1.0, 2.0], "dr": [1.0, 1.0]}}
 
     pz_params = {"pz": {"poles": [1.0, 2.0], "zeros": [3.0, 4.0]}}
 
@@ -26,7 +25,7 @@ def main(args):
     params.update(gaussian_params)
 
     if args.static_analysis:
-        in_freqs = [1.0]  # , 2000.0, 5000.0]
+        in_freqs = [1.0]  # , 20.0, 200.0, 500.0, 1000.0, 2500.0]
         in_frames = generate_mix_freq(in_freqs, noise=args.noise)
 
         test_static(
@@ -37,9 +36,7 @@ def main(args):
         )
 
     elif args.prerec_file:
-        in_frames = record_audio_file(
-            args.prerec_file, args.sample_rate, CHUNK
-        )
+        in_frames = record_audio_file(args.prerec_file)
 
         test_static(
             in_frames=in_frames,

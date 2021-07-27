@@ -13,14 +13,12 @@ CHANNELS = 1
 # ---------------------------- AUDIO UTILS ----------------------------#
 
 
-def record_audio_file(prerec_file, sample_rate, chunk):
+def record_audio_file(prerec_file):
     """
     To record sound input from file.
 
     Inputs:
         loc (str): File from which sound is recorded.
-        sample_rate (int): sampling rate parameter for processing
-        chunk (int): chunk parameter for processing
 
     Outputs:
         np_frames (np.ndarray): input frames as numpy array.

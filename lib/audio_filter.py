@@ -80,12 +80,7 @@ class AudioFilter:
                 )
 
             elif self.filter_type == "gaussian":
-                self.filter = (
-                    1
-                    / np.sqrt(
-                        2 * np.pi * self.params["gaussian"]["stdev"] ** 2
-                    )
-                ) * np.exp(
+                self.filter = np.exp(
                     -np.power(self.freqs, 2)
                     / (2 * self.params["gaussian"]["stdev"] ** 2)
                 )
