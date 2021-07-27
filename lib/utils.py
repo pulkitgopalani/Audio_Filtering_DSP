@@ -13,49 +13,6 @@ CHANNELS = 1
 # ---------------------------- AUDIO UTILS ----------------------------#
 
 
-# def record_live_audio(record_time, sample_rate, chunk):
-#     """
-#     To record sound input from live audio input.
-
-#     Inputs:
-#         record_time (int): Time for which sound is recorded.
-#         sample_rate (int): sampling rate parameter for processing
-#         chunk (int): chunk parameter for processing
-
-#     Outputs:
-#         np_frames (np.ndarray): input frames as numpy array.
-#     """
-
-#     p = pa.PyAudio()
-
-#     in_stream = p.open(
-#         format=FORMAT,
-#         rate=sample_rate,
-#         channels=CHANNELS,
-#         frames_per_buffer=chunk,
-#         input=True,
-#     )
-
-#     byte_frames = []
-#     int_frames = []
-
-#     print("----Recording Audio----")
-
-#     for _ in range((record_time * sample_rate) / chunk):
-#         data_chunk = in_stream.read(chunk)
-#         byte_frames.append(data_chunk)
-
-#         for chunk in byte_frames:
-#             int_frames.append(int(chunk))
-
-#     np_frames = np.array(int_frames)
-
-#     in_stream.stop_stream()
-#     in_stream.close()
-
-#     return np_frames
-
-
 def record_audio_file(prerec_file, sample_rate, chunk):
     """
     To record sound input from file.

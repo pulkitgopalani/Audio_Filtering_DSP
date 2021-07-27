@@ -142,8 +142,6 @@ def test_dynamic(
             }
         )
 
-    # write_audio(save_dir, int(Fs), np.array(out_frames))
-
     wav_file = wave.open(save_dir, "wb")
     wav_file.setnchannels(1)
     wav_file.setsampwidth(pa.get_sample_size(pa.paInt16))
@@ -158,48 +156,3 @@ def test_dynamic(
     p.terminate()
 
     return out_frames_np
-
-
-'''
-def record_live_audio(record_time, sample_rate, chunk):
-    """
-    To record sound input from live audio input.
-
-    Inputs:
-        record_time (int): Time for which sound is recorded.
-        sample_rate (int): sampling rate parameter for processing
-        chunk (int): chunk parameter for processing
-
-    Outputs:
-        np_frames (np.ndarray): input frames as numpy array.
-    """
-
-    p = pa.PyAudio()
-
-    in_stream = p.open(
-        format=FORMAT,
-        rate=sample_rate,
-        channels=CHANNELS,
-        frames_per_buffer=chunk,
-        input=True,
-    )
-
-    byte_frames = []
-    int_frames = []
-
-    print("----Recording Audio----")
-
-    for _ in range((record_time * sample_rate) / chunk):
-        data_chunk = in_stream.read(chunk)
-        byte_frames.append(data_chunk)
-
-        for chunk in byte_frames:
-            int_frames.append(int(chunk))
-
-    np_frames = np.array(int_frames)
-
-    in_stream.stop_stream()
-    in_stream.close()
-
-    return np_frames
-'''

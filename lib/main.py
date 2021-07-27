@@ -10,17 +10,6 @@ FORMAT = pa.paInt16
 CHUNK = 1024
 CHANNELS = 1
 
-"""
-TODO: 
-    0. (Done) Bytes -- np.array conversions
-    1. (Done) Test on static input
-    2. (Done) Test on pre-recorded file
-    3. Test H(z) filters
-    4. Test on live audio
-    5. Check callback function in pyaudio
-       for real time processing
-"""
-
 
 def main(args):
 
