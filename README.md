@@ -1,5 +1,8 @@
 ## EE301 Course Project (Summer 2021)
 
+Pulkit Gopalani  
+Roll No. 180564
+
 Audio filtering using Fourier transforms based filters.
 
 Requirements:  
