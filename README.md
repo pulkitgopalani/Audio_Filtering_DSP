@@ -30,4 +30,4 @@ Args are:
     
   ```
   
-Please change the frequency mixture (for static analysis) directly in main.py. 
+Please change the frequency mixture (for static analysis), LCCDE coeffs and poles-zeros directly in lib/main.py. 
