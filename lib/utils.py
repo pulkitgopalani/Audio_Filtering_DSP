@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import wave
 from scipy.io.wavfile import read
 
-from filter import AudioFilter
+from audio_filter import AudioFilter
 
 FORMAT = pa.paInt16
 CHANNELS = 1
@@ -13,50 +13,50 @@ CHANNELS = 1
 # ---------------------------- AUDIO UTILS ----------------------------#
 
 
-def record_live_audio(record_time, sample_rate, chunk):
-    """
-    To record sound input from live audio input.
+# def record_live_audio(record_time, sample_rate, chunk):
+#     """
+#     To record sound input from live audio input.
 
-    Inputs:
-        record_time (int): Time for which sound is recorded.
-        sample_rate (int): sampling rate parameter for processing
-        chunk (int): chunk parameter for processing
+#     Inputs:
+#         record_time (int): Time for which sound is recorded.
+#         sample_rate (int): sampling rate parameter for processing
+#         chunk (int): chunk parameter for processing
 
-    Outputs:
-        np_frames (np.ndarray): input frames as numpy array.
-    """
+#     Outputs:
+#         np_frames (np.ndarray): input frames as numpy array.
+#     """
 
-    p = pa.PyAudio()
+#     p = pa.PyAudio()
 
-    in_stream = p.open(
-        format=FORMAT,
-        rate=sample_rate,
-        channels=CHANNELS,
-        frames_per_buffer=chunk,
-        input=True,
-    )
+#     in_stream = p.open(
+#         format=FORMAT,
+#         rate=sample_rate,
+#         channels=CHANNELS,
+#         frames_per_buffer=chunk,
+#         input=True,
+#     )
 
-    byte_frames = []
-    int_frames = []
+#     byte_frames = []
+#     int_frames = []
 
-    print("----Recording Audio----")
+#     print("----Recording Audio----")
 
-    for _ in range((record_time * sample_rate) / chunk):
-        data_chunk = in_stream.read(chunk)
-        byte_frames.append(data_chunk)
+#     for _ in range((record_time * sample_rate) / chunk):
+#         data_chunk = in_stream.read(chunk)
+#         byte_frames.append(data_chunk)
 
-        for chunk in byte_frames:
-            int_frames.append(int(chunk))
+#         for chunk in byte_frames:
+#             int_frames.append(int(chunk))
 
-    np_frames = np.array(int_frames)
+#     np_frames = np.array(int_frames)
 
-    in_stream.stop_stream()
-    in_stream.close()
+#     in_stream.stop_stream()
+#     in_stream.close()
 
-    return np_frames
+#     return np_frames
 
 
-def record_prerec_audio(prerec_file, sample_rate, chunk):
+def record_audio_file(prerec_file, sample_rate, chunk):
     """
     To record sound input from file.
 
@@ -111,7 +111,7 @@ def play_audio_from_np(out_frames, sample_rate):
 # ---------------------------- PLOT & FFT UTILS ----------------------------#
 
 
-def plot_frames(frame_dict, n_cols=2, filename="../assets/analysis.jpg"):
+def plot_frames(frame_dict, n_cols=2, filename="../assets/plots/signals.jpg"):
     """
     Plot frames as matplotlib plot.
 
@@ -144,7 +144,7 @@ def plot_frames(frame_dict, n_cols=2, filename="../assets/analysis.jpg"):
     plt.close()
 
 
-def generate_mix_freq(freqs):
+def generate_mix_freq(freqs, noise=False):
     """
     Generate frequency mixture of sine waves of freqeuncies in freqs
 
@@ -164,6 +164,9 @@ def generate_mix_freq(freqs):
     for freq in freqs:
         sin_freq = np.sin(2 * np.pi * freq * range)
         result += sin_freq
+
+    if noise:
+        result += np.random.randn(result.size)
 
     return result
 
