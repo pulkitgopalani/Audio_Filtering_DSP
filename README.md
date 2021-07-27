@@ -8,7 +8,7 @@ Requirements:
 * Matplotlib  
 * PyAudio
 
-Run the following command in the `DSP_Project/lib/` directory:
+Run the following command in the `./lib/` directory:
 
 `python main.py (--args)`  
 
