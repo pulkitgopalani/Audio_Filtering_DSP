@@ -1,10 +1,7 @@
-## EE301 Course Project (Summer 2021)
+## Audio Filtering  
+# (Course Project, Digital Signal Processing, Summer 2021)
 
-Pulkit Gopalani  
-Roll No. 180564
-
-Audio filtering using Fourier transforms based filters.
-
+Audio filtering for recorded and live audio using basic filters like Low-Pass, High-Pass etc.  
 Requirements:  
 * Python 3.8 
 * Numpy  
