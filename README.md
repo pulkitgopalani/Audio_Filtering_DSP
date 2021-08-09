@@ -1,5 +1,5 @@
 ## Audio Filtering  
-# (Course Project, Digital Signal Processing, Summer 2021)
+#### (Course Project, Digital Signal Processing, Summer 2021)
 
 Audio filtering for recorded and live audio using basic filters like Low-Pass, High-Pass etc.  
 Requirements:  
